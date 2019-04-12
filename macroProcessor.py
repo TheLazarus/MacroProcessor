@@ -12,7 +12,6 @@ class MProcessor():
     def writeProgram(self):
         startIndex = 0
         inst_split = []
-        MNT_extIndex = 0
         lineNumber = 1
         while(1):
             line = input(f"\n Enter the line number {lineNumber} :")
@@ -33,9 +32,11 @@ class MProcessor():
                  self.MNT[splitstring[0]][counter] = 0
              elif(self.instructionList[counter].find('MEND') != -1):
                      self.macroEndIndices.append(counter)
-                     for key in self.MNT.keys():
-                         self.MNT[key][self.macroStartIndices[startIndex]] = self.macroEndIndices[startIndex] #Assign Start and End Indices to all the macros found in our program
-                         startIndex+=1
+                     for key,val in self.MNT.items():
+                         for keys,vals in val.items():
+                             if(vals == 0):
+                                 self.MNT[key][self.macroStartIndices[startIndex]] = self.macroEndIndices[startIndex] #Assign Start and End Indices to all the macros found in our program
+                     startIndex+=1
 
 #Add Macro Names to The Macro Name Table and Operand Parameters to the OPTAB
         for index in self.macroStartIndices:
@@ -54,17 +55,21 @@ class MProcessor():
             print(f"\n\t{key} --------------> {values}")
 
         print("\n\n\t\t Performing Macro Expansion Now...")
-        print("\n\n\t\t || Expanded Source Code ||")    
-        for instructions in self.instructionList[self.macroEndIndices[-1]:len(self.instructionList)]:
+        print("\n\n\t\t ||  Expanded Source Code ||")
+        track = 0
+        for instructions in self.instructionList[self.macroEndIndices[-1]+1:len(self.instructionList)]:
             inst_split = instructions.split()
             if(inst_split[0] in self.MNT.keys()):
                 print("\n\n### Macro Calls Encountered ### ")
-                for key,value in self.MNT.items():
+
+                for keys,value in self.MNT.items():
                         for key,val in value.items():
                             for items in self.instructionList[key+1:val]:
+                                track+=1
                                 print(items)
             else:
                 print(instructions)
+            print(track)
 if(__name__  == "__main__"):
     print("\n\n\t\t\t ### Macro Processor ###")
     mProcessor = MProcessor()
